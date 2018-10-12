@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">></script>
+  <link rel="stylesheet" type="text/css" href="Chat.css" />
+</head>
+<body>
+<h2>Chatbot</h2>
+<input type="text" id="txt_field">
+<br>
+<button type="button" onclick="loadDoc()">send</button>
+<p id="demo"></p>
+<textarea readonly name="cnt1" id="cnt1" width: 100px; height: 100px; rows ="20" cols="50"></textarea>
+<script>
+function loadDoc() {
+  var xhttp = new XMLHttpRequest();
+  var data;
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+     //document.getElementById("cnt1").innerHTML+=this.responseText;
+       var2 = this.responseText;
+      $('#cnt1').append(var2+"\n"); 
+    }
+  };
+  var request = JSON.stringify({ x: 5, y: 6 });
+  var txt = document.getElementById("txt_field").value;
+  console.log(txt);
+  var req =
+        {"BotRequest":
+            {
+                "Message":
+                {
+                    "UnstructuredMessage":
+                    {
+                        "Text":txt,
+                    }
+                }
+            }
+        }
+  xhttp.open("POST","https://3a20encjrd.execute-api.us-east-2.amazonaws.com/chatapi/chatbot", true);
+  xhttp.send(JSON.stringify(req));
+}
+</script>
+</body>
+</html>
