@@ -23,7 +23,7 @@ public class chatBotRequestHandler implements RequestHandler<Object, String> {
     	}else if(request.contains("bye")){
     		return "Bye Bye!";
     	}else if(request.contains("namaste")){
-    		return "Namaste";
+    		return "Namaste Kaise ho app?";
     	}else {
     		return "Please try again";
     	}
