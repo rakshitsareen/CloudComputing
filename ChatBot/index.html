@@ -2,7 +2,20 @@
 <html>
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">></script>
-  <link rel="stylesheet" type="text/css" href="Chat.css" />
+  <script type="text/javascript" src="lib/axios/dist/axios.standalone.js"></script>
+<script type="text/javascript" src="lib/CryptoJS/rollups/hmac-sha256.js"></script>
+<script type="text/javascript" src="lib/CryptoJS/rollups/sha256.js"></script>
+<script type="text/javascript" src="lib/CryptoJS/components/hmac.js"></script>
+<script type="text/javascript" src="lib/CryptoJS/components/enc-base64.js"></script>
+<script type="text/javascript" src="lib/url-template/url-template.js"></script>
+<script type="text/javascript" src="lib/apiGatewayCore/sigV4Client.js"></script>
+<script type="text/javascript" src="lib/apiGatewayCore/apiGatewayClient.js"></script>
+<script type="text/javascript" src="lib/apiGatewayCore/simpleHttpClient.js"></script>
+<script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
+<script type="text/javascript" src="apigClient.js"></script>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.41.0.min.js"></script>      
+<script type="text/javascript" src="lib/amazon-cognito-auth.min.js"></script>
+  
 </head>
 <body>
 <h2>Chatbot</h2>
@@ -11,15 +24,120 @@
 <button type="button" onclick="loadDoc()">send</button>
 <p id="demo"></p>
 <textarea readonly name="cnt1" id="cnt1" width: 100px; height: 100px; rows ="20" cols="50"></textarea>
-<script>
+<script type="text/javascript">
+
+  // When using loose Javascript files:
+var CognitoAuth = AmazonCognitoIdentity.CognitoAuth;
+
+// Modules, e.g. Webpack:
+//var AmazonCognitoIdentity = require('amazon-cognito-auth-js');
+//var CognitoAuth = AmazonCognitoIdentity.CognitoAuth;
+  let ss;
+  AWS.config.region = 'us-east-1'; // Region
+AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: 'us-east-1:c2493423-1eb0-45c6-be15-e83194506be2'
+});
+
+ // Make the call to obtain credentials
+AWS.config.credentials.get(function(){
+
+    // Credentials will be available when this function is called.
+    var accessKeyId = AWS.config.credentials.accessKeyId;
+    var secretAccessKey = AWS.config.credentials.secretAccessKey;
+    var sessionToken = AWS.config.credentials.sessionToken;
+    
+    ss = sessionToken;
+    
+    
+
+});
+
+
+function initCognitoSDK(){
+       var authData = {
+  ClientId : '7f6ru3qdrq5d964c58obdllh4h', // Your client id here
+  AppWebDomain : 'login.chatbot.dhruvarora.co.in',
+  TokenScopesArray : ['phone', 'email', 'profile','openid', 'aws.cognito.signin.user.admin'], // e.g.['phone', 'email', 'profile','openid', 'aws.cognito.signin.user.admin'],
+  RedirectUriSignIn : 'https://www.chatbot.dhruvarora.co.in',
+  RedirectUriSignOut : 'https://www.dhruvarora.co.in',
+  // IdentityProvider : '<TODO: add identity provider you want to specify>', // e.g. 'Facebook',
+  UserPoolId : 'us-east-1_mNiopvjeX', // Your user pool id here
+  // AdvancedSecurityDataCollectionFlag : '<TODO: boolean value indicating whether you want to enable advanced security data collection>', // e.g. true
+  //       Storage: '<TODO the storage object>' // OPTIONAL e.g. new CookieStorage(), to use the specified storage provided
+};
+
+var auth = new AmazonCognitoIdentity.CognitoAuth(authData);
+return auth;
+}
+
+function getUrlVars() {
+    var vars = {};
+    var urlparts = window.location.href.split("/")
+    console.log(urlparts)
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
+}
+
 function loadDoc() {
+
+var url = window.location.href;
+url_Split = url.split("/");
+token_split = url_Split[url_Split.length - 1].split("&");
+id_token = token_split[0].split("=");
+var token_id_final = id_token[1];
+console.log(id_token[1])
+
+//   var dataLogin = {
+//         UserPoolId : 'us-east-1_mNiopvjeX', // Your user pool id here
+//         identityPoolId : 'us-east-1:c2493423-1eb0-45c6-be15-e83194506be2'
+//     };
+
+
+//     var auth = initCognitoSDK();
+//     auth.userhandler = {
+//   onSuccess: function(result) {
+    
+//     console.log("Succesful Signed in");
+//   },
+//   onFailure: function(err) {
+//     alert("Error!");
+//   }
+// };
+//     var curUrl = window.location.href;
+  //  auth.parseCognitoWebResponse(curUrl);
+
+//var auth = new AmazonCognitoIdentity.CognitoAuth(authData);
+
+    
+   // var token_ID  = auth.getSession();
+   // console.log("The actual session "+token_ID);
+
+
+    // var auth = new AuthClass(config: data);
+    // var cognitoUser = userPool.CurrentUserCredentials();
+    // var currentsession = userPool.CurrentSession();
+    // console.log("The"+currentsession);
+    // console.log("The__"+cognitoUser);
+
+
+//   console.log("This is also printing! "+ss);
+ //  console.log("This is strange"+AWS.config.credentials.sessionToken);
+
+    var apigClient = apigClientFactory.newClient({
+  apiKey: 'lqjn73d6Qq6jW11EOFOni2WtsvjR1SzA7hALOruf'
+});
+
+
+
   var xhttp = new XMLHttpRequest();
   var data;
-  xhttp.onreadystatechange = function() {
+  apigClient.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
      //document.getElementById("cnt1").innerHTML+=this.responseText;
        var2 = this.responseText;
-      $('#cnt1').append(var2+"\n"); 
+      $('#cnt1').append(var2+"\n")
     }
   };
   var request = JSON.stringify({ x: 5, y: 6 });
@@ -37,8 +155,45 @@ function loadDoc() {
                 }
             }
         }
-  xhttp.open("POST","https://3a20encjrd.execute-api.us-east-2.amazonaws.com/chatapi/chatbot", true);
-  xhttp.send(JSON.stringify(req));
+
+ 
+
+
+var params = {
+  // This is where any modeled request parameters should be added.
+  // The key is the parameter name, as it is defined in the API in API Gateway.
+
+
+};
+
+var additionalParams = {
+  // If there are any unmodeled query parameters or headers that must be
+  //   sent with the request, add them here.
+  headers: {
+    'Authorization':token_id_final
+  }
+ 
+};
+  var body = {
+  // This is where you define the body of the request,
+  "Message":txt
+};
+
+
+
+apigClient.chatbotPost(params, body, additionalParams).then(function(result){
+      $('#cnt1').append(result.data+"\n")
+    }).catch( function(result){
+      console.log(result.data.Message)
+      console.log(result.response)
+
+      $('#cnt1').append("Error"+"\n")
+    });
+
+   
+
+  //xhttp.open("POST","https://xzumxyte8a.execute-api.us-east-1.amazonaws.com/dev/chatbot", true);
+  //xhttp.send(JSON.stringify(req));
 }
 </script>
 </body>
