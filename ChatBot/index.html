@@ -2,7 +2,18 @@
 <html>
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">></script>
-  <link rel="stylesheet" type="text/css" href="Chat.css" />
+  <script type="text/javascript" src="lib/axios/dist/axios.standalone.js"></script>
+  <script type="text/javascript" src="lib/CryptoJS/rollups/hmac-sha256.js"></script>
+  <script type="text/javascript" src="lib/CryptoJS/rollups/sha256.js"></script>
+  <script type="text/javascript" src="lib/CryptoJS/components/hmac.js"></script>
+  <script type="text/javascript" src="lib/CryptoJS/components/enc-base64.js"></script>
+  <script type="text/javascript" src="lib/url-template/url-template.js"></script>
+  <script type="text/javascript" src="lib/apiGatewayCore/sigV4Client.js"></script>
+  <script type="text/javascript" src="lib/apiGatewayCore/apiGatewayClient.js"></script>
+  <script type="text/javascript" src="lib/apiGatewayCore/simpleHttpClient.js"></script>
+  <script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
+  <script type="text/javascript" src="apigClient.js"></script>
+  <script src="https://sdk.amazonaws.com/js/aws-sdk-2.41.0.min.js"></script>
 </head>
 <body>
 <h2>Chatbot</h2>
@@ -13,32 +24,43 @@
 <textarea readonly name="cnt1" id="cnt1" width: 100px; height: 100px; rows ="20" cols="50"></textarea>
 <script>
 function loadDoc() {
+  var apigClient = apigClientFactory.newClient({
+    apiKey: '7CKxYsdyTk15Y6Ml9pY5J8YxdBMZVMzU2vWqy7Ld'
+  });
   var xhttp = new XMLHttpRequest();
   var data;
-  xhttp.onreadystatechange = function() {
+  xhttp.onreadystatechange = function(){
     if (this.readyState == 4 && this.status == 200) {
      //document.getElementById("cnt1").innerHTML+=this.responseText;
        var2 = this.responseText;
-      $('#cnt1').append(var2+"\n"); 
+      $('#cnt1').append(var2+"\n");
     }
   };
-  var request = JSON.stringify({ x: 5, y: 6 });
+  //var request = JSON.stringify({ x: 5, y: 6 });
   var txt = document.getElementById("txt_field").value;
   console.log(txt);
-  var req =
-        {"BotRequest":
-            {
-                "Message":
-                {
-                    "UnstructuredMessage":
-                    {
-                        "Text":txt,
-                    }
-                }
-            }
-        }
-  xhttp.open("POST","https://3a20encjrd.execute-api.us-east-2.amazonaws.com/chatapi/chatbot", true);
-  xhttp.send(JSON.stringify(req));
+  var params = {
+  // This is where any modeled request parameters should be added.
+  // The key is the parameter name, as it is defined in the API in API Gateway.
+  };
+
+var body = {
+  // This is where you define the body of the request,
+  "user_query":txt
+};
+
+var additionalParams = {
+  // If there are any unmodeled query parameters or headers that must be
+  //   sent with the request, add them here.
+};
+apigClient.chatbotPost(params, body, additionalParams).then(function(result){
+      $('#cnt1').append(result.data+"\n")
+    }).catch( function(result){
+      console.log(result.data.Message)
+      console.log(result.response)
+
+      $('#cnt1').append("Error"+"\n")
+    });
 }
 </script>
 </body>
