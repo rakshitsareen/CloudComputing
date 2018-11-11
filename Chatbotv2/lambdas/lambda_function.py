@@ -9,8 +9,7 @@ def lambda_handler(event, context):
     AccessToken=access_token
     )
     print("The cog "+str(resp))
-    
-    print("Checkingggg")
+   
     
     userattr = resp['UserAttributes']
     email = ''
